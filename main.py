@@ -1,6 +1,10 @@
 import pygame
 from os import walk
 
+SCREEN_WIDTH = 1280
+SCREEN_HEIGHT = 720
+FPS = 60
+
 
 class Object:
     def __init__(self, x, y, width, height, image):
@@ -119,8 +123,8 @@ class Player(Entity):
         super().update()
         self.attack()
         self.reloading()
-        self.x = max(0, min(self.x, 500 - self.width))
-        self.y = max(0, min(self.y, 500 - self.height))
+        self.x = max(0, min(self.x, SCREEN_WIDTH - self.width))
+        self.y = max(0, min(self.y, SCREEN_HEIGHT - self.height))
 
 
 def load_spritesheet(filename):
@@ -141,11 +145,11 @@ def load_spritesheet(filename):
 
 if __name__ == "__main__":
     pygame.init()
-    screen = pygame.display.set_mode((500, 500))
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     clock = pygame.time.Clock()
 
     objects = []
-    player = Player(500 / 2, 500 / 2, 200, 200, "data/player/", 2)
+    player = Player(SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 100, 200, 200, "data/player/", 2)
 
     running = True
 
@@ -178,5 +182,5 @@ if __name__ == "__main__":
         screen.fill((255, 255, 255))
         for obj in objects:
             obj.update()
-        clock.tick(60)
+        clock.tick(FPS)
         pygame.display.update()
