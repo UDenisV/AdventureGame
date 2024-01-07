@@ -13,15 +13,12 @@ class Object:
         self.width = width
         self.height = height
         self.image = image
-        self.vector = [0, 0]
         objects.append(self)
 
     def draw(self):
         screen.blit(pygame.transform.scale(self.image, (self.width, self.height)), (self.x, self.y))
 
     def update(self):
-        self.x += self.vector[0]
-        self.y += self.vector[1]
         self.draw()
 
 
@@ -31,6 +28,7 @@ class Entity(Object):
 
         self.speed = speed
         self.spritesheet = load_spritesheet(spritesheet)
+        self.vector = [0, 0]
         self.pose = 'down'
         self.flipx = False
         self.frame = 0
@@ -94,6 +92,8 @@ class Player(Entity):
         self.attacking = False
         self.attack_reload = 300
         self.attack_time = None
+        self.hitbox_size = (16 * 3, 28 * 3)
+        self.hitbox_corner = (24 * 3, 20 * 3)
 
     def change_pos(self):
         if self.attacking:
@@ -118,6 +118,12 @@ class Player(Entity):
             if current_time - self.attack_time >= self.attack_reload:
                 self.attacking = False
                 self.frame = 0
+
+    def draw(self):
+        pygame.draw.rect(screen, (0, 0, 0), (
+            self.hitbox_corner[0] + self.x, self.hitbox_corner[1] + self.y, self.hitbox_size[0], self.hitbox_size[1]),
+                         1)
+        super().draw()
 
     def update(self):
         super().update()
@@ -149,7 +155,7 @@ if __name__ == "__main__":
     clock = pygame.time.Clock()
 
     objects = []
-    player = Player(SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 100, 200, 200, "data/player/", 2)
+    player = Player(SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 100, 64 * 3, 64 * 3, "data/player/", 2)
 
     running = True
 
