@@ -133,6 +133,53 @@ class Player(Entity):
         self.y = max(0, min(self.y, SCREEN_HEIGHT - self.height))
 
 
+class Enemy(Entity):
+    def __init__(self, x, y, width, height, spritesheet, speed, radius_detection, radius_attack):
+        super().__init__(x, y, width, height, spritesheet, speed)
+        self.radius_detection = radius_detection
+        self.radius_attack = radius_attack
+        self.enemy_moving = {"left": False, "right": False, "up": False, "down": False}
+        self.hitbox_size = (16 * 3, 28 * 3)
+        self.hitbox_corner = (24 * 3, 20 * 3)
+
+    def moving(self):
+        if (player.x - self.x) ** 2 + (player.y - self.y) ** 2 <= self.radius_detection ** 2:
+            if self.x < player.x:
+                self.enemy_moving["right"] = True
+            else:
+                self.enemy_moving["right"] = False
+            if self.x > player.x:
+                self.enemy_moving["left"] = True
+            else:
+                self.enemy_moving["left"] = False
+            if self.y < player.y:
+                self.enemy_moving["down"] = True
+            else:
+                self.enemy_moving["down"] = False
+            if self.y > player.y:
+                self.enemy_moving["up"] = True
+            else:
+                self.enemy_moving["up"] = False
+            self.vector[0] = self.enemy_moving["right"] - self.enemy_moving["left"]
+            self.vector[1] = self.enemy_moving["down"] - self.enemy_moving["up"]
+        else:
+            self.enemy_moving["left"] = False
+            self.enemy_moving["right"] = False
+            self.enemy_moving["down"] = False
+            self.enemy_moving["up"] = False
+            self.vector = [0, 0]
+
+    def draw(self):
+        super().draw()
+        pygame.draw.rect(screen, (0, 0, 0),
+                         (self.hitbox_corner[0] + self.x, self.hitbox_corner[1] + self.y, self.hitbox_size[0],
+                          self.hitbox_size[1]), 1)
+
+    def update(self):
+        self.moving()
+        super().update()
+
+
 def load_spritesheet(filename):
     spritesheet = {"down": [], "down_horizontal": [], "horizontal": [], "up_horizontal": [], "up": [],
                    "down_attack": [], "down_horizontal_attack": [], "horizontal_attack": [], "up_horizontal_attack": [],
@@ -156,6 +203,7 @@ if __name__ == "__main__":
 
     objects = []
     player = Player(SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 100, 64 * 3, 64 * 3, "data/player/", 2)
+    enemy = Enemy(SCREEN_WIDTH / 5, SCREEN_HEIGHT / 5, 64 * 3, 64 * 3, "data/yasher/", 1, 200, 200)
 
     running = True
 
